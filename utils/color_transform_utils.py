@@ -11,7 +11,7 @@ def plot_model_delta_hist(opt):
 
     for split in ['train', 'valid', 'test']:
         #load pkl with 
-        colorNet_preds_ds = pd.read_pickle(os.path.join(opt.predictions_path,'predictions-' + split + 'pkl'))
+        colorNet_preds_ds = pd.read_pickle(os.path.join(opt.predictions_path,'predictions-' + split + '.pkl'))
 
         #plot and save hist
         colorNet_delta = np.concatenate(colorNet_preds_ds['DELTA'])
