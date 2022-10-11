@@ -177,7 +177,7 @@ def run(opt):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     #TODO add others illuminants
-    parser.add_argument('--illuminant', type=str, default='D65', choices=['D50', 'D65', 'F1', 'F11', 'F4', 'FF', 'LED-B1', 'LED-V1', 'D65s'], help='illuminant to use [D65, F11, F4, ...]')
+    parser.add_argument('--illuminant', type=str, default='D65', help='illuminant to use [D65, F11, F4, ...], in case of folder_split it can be used to name the output dir')
     parser.add_argument('--data_dir', type=str, default='multiviews', help='path to the dataset root')
     parser.add_argument('--batch', type=int, default=32, help='batch size')
     parser.add_argument('--output_dir', type=str, default='experiments', help='output directory pathname')
