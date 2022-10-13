@@ -10,7 +10,7 @@ from utils.plot_utils import plot_hist_pred_delta_e, plot_boxplot_pred_delta_e
 
 def predict_on_df(model,df,opt):
 
-    columns = ['mesh', 'color', 'subcolor', 'LAB', 'pred_LAB', 'DELTA']
+    columns = ['mesh', 'color', 'subcolor', 'light', 'LAB', 'pred_LAB', 'DELTA']
     result_df = pd.DataFrame(columns=columns)
 
     for i in range(len(df)):
@@ -18,6 +18,7 @@ def predict_on_df(model,df,opt):
         subcolor = df[i]['subcolor'][0]
         LAB = np.expand_dims(df[i]['LAB'][0],0)
         mesh = df[i]['shape'][0]
+        light = df[i]['light'][0]
 
         data = df[i]['data']
 
@@ -35,7 +36,7 @@ def predict_on_df(model,df,opt):
         delta = delta_e(pred_lab, LAB)
 
         
-        result_df = result_df.append( {'mesh': mesh, 'color':color, 'subcolor':subcolor, 'LAB':LAB[0], 'pred_LAB':pred_lab.numpy()[0], 'DELTA': delta.numpy()}
+        result_df = result_df.append( {'mesh': mesh, 'color':color, 'subcolor':subcolor,'light':light, 'LAB':LAB[0], 'pred_LAB':pred_lab.numpy()[0], 'DELTA': delta.numpy()}
             ,ignore_index=True)
     return result_df
 
@@ -125,7 +126,7 @@ def evaluate(opt):
 
     final_output_dir = os.path.join(opt.output_dir, opt.illuminant, str(opt.n_views) + '_views', opt.mode ,'run')
 
-    columns = ['mesh', 'color', 'subcolor', 'LAB', 'pred_LAB', 'DELTA']
+    columns = ['mesh', 'color', 'subcolor', 'light', 'LAB', 'pred_LAB', 'DELTA']
 
     #switch here
     if opt.test_on == 'folder_split':
