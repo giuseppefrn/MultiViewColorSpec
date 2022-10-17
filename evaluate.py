@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 from utils.data_loader import get_data_illuminant_data, get_random_k_view, split_on_value, get_data_from_dir
-from utils.metrics import delta_e
+from utils.metrics import delta_e, delta_e_2000
 from models.model import build_model
 from utils.plot_utils import plot_hist_pred_delta_e, plot_boxplot_pred_delta_e
 
@@ -33,7 +33,7 @@ def predict_on_df(model,df,opt):
         #random views
         pred_lab = model([data[:, i] for i in get_random_k_view(opt.n_views)])
         
-        delta = delta_e(pred_lab, LAB)
+        delta = delta_e_2000(pred_lab, LAB)
 
         
         result_df = result_df.append( {'mesh': mesh, 'color':color, 'subcolor':subcolor,'light':light, 'LAB':LAB[0], 'pred_LAB':pred_lab.numpy()[0], 'DELTA': delta.numpy()}

@@ -6,7 +6,7 @@ import time
 
 from utils.data_loader import get_dataset_end2end, get_random_k_view
 from models.model import build_model
-from utils.metrics import delta_e
+from utils.metrics import delta_e, delta_e_2000
 from utils.plot_utils import plot_loss, plot_de
 # from utils.models_utils import predict_on_n_views
 
@@ -95,7 +95,7 @@ def run(opt):
 
             # Update training metric.
             loss_tracker.update_state(loss_value)
-            train_metric.update_state(delta_e(y_batch_train, logits))
+            train_metric.update_state(delta_e_2000(y_batch_train, logits))
 
         # Display metrics at the end of each epoch.
         train_loss = loss_tracker.result()
@@ -118,7 +118,7 @@ def run(opt):
 
             # Update val metrics
             val_loss_tracker.update_state(loss_fn(y_batch_val, val_logits))
-            val_metric.update_state(delta_e(y_batch_val, val_logits))
+            val_metric.update_state(delta_e_2000(y_batch_val, val_logits))
 
         val_loss = val_loss_tracker.result()
         val_de = val_metric.result()
@@ -145,7 +145,7 @@ def run(opt):
 
 
                 # Update val metrics
-                test_metric.update_state(delta_e(y_batch_test, test_logits))
+                test_metric.update_state(delta_e_2000(y_batch_test, test_logits))
 
             test_de = test_metric.result()
             test_metric.reset_states()

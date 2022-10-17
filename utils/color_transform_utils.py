@@ -63,9 +63,9 @@ def predict_by_formula(opt):
 
                 actual_lab = sb_ds['LAB'][0]
 
-                delta_e76 = color.deltaE_cie76(actual_lab, pred_lab)
+                delta_e2000 = color.deltaE_ciede2000(actual_lab, pred_lab)
 
-                res = res.append({'shape': s, 'color':c, 'subcolor':sb, 'LAB': actual_lab, 'predicted LAB':pred_lab, 'Delta E': delta_e76},ignore_index=True)
+                res = res.append({'shape': s, 'color':c, 'subcolor':sb, 'LAB': actual_lab, 'predicted LAB':pred_lab, 'Delta E': delta_e2000},ignore_index=True)
 
     os.makedirs(opt.output_dir, exist_ok=True)
     res.to_pickle(os.path.join(opt.output_dir , 'formula_predictions.pkl'))

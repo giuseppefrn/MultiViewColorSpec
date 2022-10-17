@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 
+from skimage import color
+
 # For normalized LAB
 def delta_e_normalized(y_true, y_pred):
   loss = tf.sqrt(
@@ -20,3 +22,8 @@ def delta_e(y_true, y_pred):
       tf.square((y_true[:,2]) - (y_pred[:,2]))
     )
   return loss
+
+def delta_e_2000(y_true, y_pred):
+  y_true = y_true.numpy().astype(np.float32)
+
+  return color.deltaE_ciede2000(y_true, y_pred)
