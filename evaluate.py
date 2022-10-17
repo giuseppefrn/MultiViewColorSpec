@@ -36,7 +36,7 @@ def predict_on_df(model,df,opt):
         delta = delta_e_2000(pred_lab, LAB)
 
         
-        result_df = result_df.append( {'mesh': mesh, 'color':color, 'subcolor':subcolor,'light':light, 'LAB':LAB[0], 'pred_LAB':pred_lab.numpy()[0], 'DELTA': delta.numpy()}
+        result_df = result_df.append( {'mesh': mesh, 'color':color, 'subcolor':subcolor,'light':light, 'LAB':LAB[0], 'pred_LAB':pred_lab.numpy()[0], 'DELTA': delta}
             ,ignore_index=True)
     return result_df
 
