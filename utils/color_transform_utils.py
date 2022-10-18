@@ -78,7 +78,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--illuminant', type=str, default='D65', help='for this function use only D65 or D50', choices=['D65', 'D50'])
     parser.add_argument('--data_dir', type=str, default='multiviews', help='path to the dataset root')
-    parser.add_argument('--output_dir', type=str, default='experiments', help='output directory pathname')
+    parser.add_argument('--output_dir', type=str, required=True, help='output directory pathname')
     parser.add_argument('--predictions_path', type=str, help='path to model predictions pkl', required=True)
     
     opt = parser.parse_args()

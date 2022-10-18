@@ -124,7 +124,7 @@ def evaluate(opt):
     print('Weights loaded')
     print(model.summary())
 
-    final_output_dir = os.path.join(opt.output_dir, opt.illuminant, str(opt.n_views) + '_views', opt.mode ,'run')
+    final_output_dir = opt.output_dir
 
     columns = ['mesh', 'color', 'subcolor', 'light', 'LAB', 'pred_LAB', 'DELTA']
 
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--illuminant', type=str, default='D65', help='illuminant to use [D65, F11, F4, ...]')
     parser.add_argument('--data_dir', type=str, default='multiviews', help='path to the dataset root')
-    parser.add_argument('--output_dir', type=str, default='experiments', help='output directory pathname')
+    parser.add_argument('--output_dir', type=str, required=True, help='output directory pathname')
     parser.add_argument('--n_views', type=int, default=16, choices=[16,8,4,3,2,1], help='number of views to use, 1 for single view model')
     parser.add_argument('--weights', type=str, help='path to the model weights', required=True)
     parser.add_argument('--mode', type=str, default='RGBD', help='RGBD or RGB mode', choices=['RGBD', 'RGB'])

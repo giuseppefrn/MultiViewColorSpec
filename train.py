@@ -33,7 +33,17 @@ def run(opt):
 
     final_output_dir = os.path.join(output_dir, illuminant, str(n_views) + '_views', mode, 'run')
 
+    if os.path.exists(final_output_dir):
+        run_list = os.listdir(output_dir, illuminant, str(n_views) + '_views', mode)
+        i = len(run_list)
+        final_output_dir = os.path.join(output_dir, illuminant, str(n_views) + '_views', mode, 'run' + str(i))
+        print('Eperiment folder already exists - creating: {}'.format(final_output_dir))
+
     print('Experiments directory:', final_output_dir)
+    os.makedirs(final_output_dir ,exist_ok=True)
+
+    with open(os.path.join(final_output_dir, 'experiment-details.txt'), 'w') as f:
+        print('illuminant: {}, n_views: {}, lr: {}, mode: {}, test-on: {}, value: {}'.format(illuminant, n_views, opt.lr, opt.mode, opt.test_on, opt.value) ,file=f)
 
     select_test_on = (opt.test_on, opt.value)
 
