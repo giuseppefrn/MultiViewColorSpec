@@ -3,6 +3,7 @@ import tensorflow as tf
 import pandas as pd
 import os
 import time
+import yaml
 
 from utils.data_loader import get_dataset_end2end, get_random_k_view
 from models.model import build_model
@@ -34,7 +35,7 @@ def run(opt):
     final_output_dir = os.path.join(output_dir, illuminant, str(n_views) + '_views', mode, 'run')
 
     if os.path.exists(final_output_dir):
-        run_list = os.listdir(output_dir, illuminant, str(n_views) + '_views', mode)
+        run_list = os.listdir(os.path.join(output_dir, illuminant, str(n_views) + '_views', mode))
         i = len(run_list)
         final_output_dir = os.path.join(output_dir, illuminant, str(n_views) + '_views', mode, 'run' + str(i))
         print('Eperiment folder already exists - creating: {}'.format(final_output_dir))
@@ -42,8 +43,21 @@ def run(opt):
     print('Experiments directory:', final_output_dir)
     os.makedirs(final_output_dir ,exist_ok=True)
 
-    with open(os.path.join(final_output_dir, 'experiment-details.txt'), 'w') as f:
-        print('illuminant: {}, n_views: {}, lr: {}, mode: {}, test-on: {}, value: {}'.format(illuminant, n_views, opt.lr, opt.mode, opt.test_on, opt.value) ,file=f)
+    with open(os.path.join(final_output_dir, 'configuration.yaml'), 'w') as f:
+      yaml.dump(
+        {
+          'illuminant':illuminant,
+          'data_dir':data_dir,
+          'batch':batch,
+          'output_dir':final_output_dir,
+          'n_views': n_views,
+          'epochs': epochs,
+          'lr': lr,
+          'mode': mode,
+          'test_on': opt.test_on,
+          'value': opt.value
+        }
+        , f)
 
     select_test_on = (opt.test_on, opt.value)
 
