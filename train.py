@@ -197,6 +197,8 @@ def run(opt):
     plot_loss(history, final_output_dir)
     plot_de(history, final_output_dir)
 
+    return final_output_dir
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
