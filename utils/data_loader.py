@@ -312,9 +312,13 @@ def get_dataset_end2end(data_path, illuminant, mode, batch_size, output_dir, sel
     else:
         df = get_data_illuminant_data(data_path, illuminant)
         (X_train, y_train), (X_val, y_val), (X_test, Y_test) = split_dataset(df, output_dir, mode, select_test_on, validation_size=0.3)
+    
+    del df
 
     train_dataset = get_tensorflow_dataset((X_train, y_train), batch_size=batch_size)
     validation_dataset = get_tensorflow_dataset((X_val, y_val), batch_size=batch_size)
     test_dataset = get_tensorflow_dataset((X_test, Y_test), batch_size=batch_size)
+
+    del X_train, y_train, X_val, y_val, X_test, Y_test 
 
     return train_dataset, validation_dataset, test_dataset

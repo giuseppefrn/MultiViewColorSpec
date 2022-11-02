@@ -10,7 +10,7 @@ from utils.plot_utils import plot_hist_pred_delta_e, plot_boxplot_pred_delta_e
 
 def predict_on_df(model,df,opt):
 
-    columns = ['mesh', 'color', 'subcolor', 'light', 'LAB', 'pred_LAB', 'DELTA']
+    columns = ['shape', 'color', 'subcolor', 'light', 'LAB', 'pred_LAB', 'DELTA']
     result_df = pd.DataFrame(columns=columns)
 
     for i in range(len(df)):
@@ -36,7 +36,7 @@ def predict_on_df(model,df,opt):
         delta = delta_e_2000(pred_lab, LAB)
 
         
-        result_df = result_df.append( {'mesh': mesh, 'color':color, 'subcolor':subcolor,'light':light, 'LAB':LAB[0], 'pred_LAB':pred_lab.numpy()[0], 'DELTA': delta}
+        result_df = result_df.append( {'shape': mesh, 'color':color, 'subcolor':subcolor,'light':light, 'LAB':LAB[0], 'pred_LAB':pred_lab.numpy()[0], 'DELTA': delta}
             ,ignore_index=True)
     return result_df
 
@@ -126,7 +126,7 @@ def evaluate(opt):
 
     final_output_dir = opt.output_dir
 
-    columns = ['mesh', 'color', 'subcolor', 'light', 'LAB', 'pred_LAB', 'DELTA']
+    columns = ['shape', 'color', 'subcolor', 'light', 'LAB', 'pred_LAB', 'DELTA']
 
     #switch here
     if opt.test_on == 'folder_split':
