@@ -53,7 +53,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, help='path to the data', required=True)
     parser.add_argument('--output_dir', type=str, default='experiments', help='output directory pathname')
-    parser.add_argument('--n_views', type=int, default=16, choices=[16,8,4,3,2,1], help='number of views to use')
+    parser.add_argument('--n_views', type=int, default=16, help='number of views to use')
     parser.add_argument('--weights', type=str, help='path to the model weights', required=True)
     parser.add_argument('--mode', type=str, default='RGBD', help='RGBD or RGB mode', choices=['RGBD', 'RGB'])
 

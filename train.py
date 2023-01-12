@@ -22,7 +22,14 @@ def save_new_best(model, final_output_dir):
   os.makedirs(final_output_dir, exist_ok=True)
   model.save_weights(os.path.join(final_output_dir, 'model-best.h5'))
 
+def print_gpu_memory_usage(msg):
+    print(msg)
+    if tf.config.list_physical_devices('GPU'):
+        print('current', tf.config.experimental.get_memory_info('GPU:0')['current']/1024/1024/1024)
+        print('peak', tf.config.experimental.get_memory_info('GPU:0')['peak']/1024/1024/1024)
+
 def run(opt):
+
     illuminant = opt.illuminant
     data_dir = opt.data_dir
     batch = opt.batch
@@ -61,12 +68,18 @@ def run(opt):
 
     select_test_on = (opt.test_on, opt.value)
 
+    print_gpu_memory_usage("before data load")
+
     train_dataset, validation_dataset, test_dataset = get_dataset_end2end(data_dir, illuminant, mode, batch, final_output_dir, select_test_on)
+
+    print_gpu_memory_usage("after data load")
 
     print('Building model...')
     model = build_model(n_views, mode)
 
     print(model.summary())
+
+    print_gpu_memory_usage("after model load")
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
     loss_fn = tf.keras.losses.MeanSquaredError()
@@ -105,14 +118,22 @@ def run(opt):
 
         # Iterate over the batches of the dataset.
         for step, (x_batch_train, y_batch_train) in enumerate(train_dataset):
+            inputs = [x_batch_train[:, i] for i in get_random_k_view(n_views)]
+
             with tf.GradientTape() as tape:
+                if step == 0:
+                    print_gpu_memory_usage("start step 0")
+
                 #fixed positions
                 # logits = model([x_batch_train[:, i] for i in views_dict_idxs[n_views]])
 
                 # testing position indipendence and random views
-                logits = model([x_batch_train[:, i] for i in get_random_k_view(n_views)])
+                logits = model(inputs)
 
                 loss_value = loss_fn(y_batch_train, logits)
+                
+                if step == 0:
+                    print_gpu_memory_usage("end step 0")
 
             grads = tape.gradient(loss_value, model.trainable_weights)
             optimizer.apply_gradients(zip(grads, model.trainable_weights))
@@ -197,6 +218,7 @@ def run(opt):
     plot_loss(history, final_output_dir)
     plot_de(history, final_output_dir)
 
+    del model, train_dataset, test_dataset, validation_dataset
     return final_output_dir
 
 
@@ -208,7 +230,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch', type=int, default=32, help='batch size')
     parser.add_argument('--output_dir', type=str, default='experiments', help='output directory pathname')
     parser.add_argument('--epochs', type=int, default=100, help='number of epochs')
-    parser.add_argument('--n_views', type=int, default=16, choices=[16,8,4,3,2,1], help='number of views to use, 1 for single view model')
+    parser.add_argument('--n_views', type=int, default=16, help='number of views to use, 1 for single view model')
     parser.add_argument('--lr', type=float, default=1e-3, help='initial learning rate')
     parser.add_argument('--test', type=int, choices=[0,1,2], default=2, help='0 dont test the model, 1 test at the end of training, 2 test after each epoch')
     parser.add_argument('--mode', type=str, default='RGBD', help='RGBD or RGB mode', choices=['RGBD', 'RGB'])

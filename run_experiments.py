@@ -5,6 +5,7 @@ import shutil
 import numpy as np
 import pandas as pd
 from skimage import color
+from matplotlib import pyplot as plt
 
 from utils.data_loader import get_data_illuminant_data
 from utils.plot_utils import plot_hist
@@ -90,37 +91,48 @@ class DictObj:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    #TODO add others illuminants
     parser.add_argument('--base_dir', type=str, required=True, help='base dir')
+    parser.add_argument('--conf_folder', type=str, required=True, help='conf folder name')
     opt = parser.parse_args()
 
     base_dir = opt.base_dir
-    conf_dir = os.path.join(base_dir, 'confs')
+    conf_dir = os.path.join(base_dir, opt.conf_folder)
+    print(conf_dir)
     confs = os.listdir(conf_dir)
-
+    
     for conf in confs:
+      print()
+      print("confs:", conf)
+      print()
       if conf[0] != '.':
         with open(os.path.join(conf_dir, conf), 'r') as f:
-            c = yaml.safe_load(f)
-
-            c1 = DictObj(c)
-            output_dir = run(c1)
-
-            c['output_dir'] = output_dir
-            c['weights'] = os.path.join(output_dir, 'model-best.h5')
+          c = yaml.safe_load(f)
             
-            c1 = DictObj(c)
-            evaluate(c1)
+        c1 = DictObj(c)
+        output_dir = run(c1)
 
-            c['predictions_path'] = output_dir
-            
-            c1 = DictObj(c)
-            
-            if c1.illuminant == 'D65':
-              predict_by_formula(c1)
+        plt.close('all') 
 
-            plot_model_delta_hist(c1)
+        c['output_dir'] = output_dir
+        c['weights'] = os.path.join(output_dir, 'model-best.h5')
+        
+        c1 = DictObj(c)
+        evaluate(c1)
+
+        plt.close('all') 
+
+        c['predictions_path'] = output_dir
+        
+        c1 = DictObj(c)
+        
+        # if c1.illuminant == 'D65':
+        #   predict_by_formula(c1)
+
+        plot_model_delta_hist(c1)
+
+        plt.close('all')
+      
+        if os.path.exists(os.path.join(output_dir, 'chkp')):
+          shutil.rmtree(os.path.join(output_dir, 'chkp'))
+          os.remove(os.path.join(conf_dir, conf))
             
-            if os.path.exists(os.path.join(output_dir, 'chkp')):
-              shutil.rmtree(os.path.join(output_dir, 'chkp'))
-        os.remove(os.path.join(conf_dir, conf))

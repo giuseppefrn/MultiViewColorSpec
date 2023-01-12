@@ -101,25 +101,27 @@ def build_model(N_view = 16, mode='RGBD'):
   if N_view == 1:
     return build_singleview_model(mode)
 
-  inputs = [tf.keras.Input(shape=(128,128,4)) for i in range(N_view)]
-
   if mode == 'RGB':
-    inputs = [tf.keras.Input(shape=(128,128,3)) for i in range(N_view)]
+    inputs = [tf.keras.Input(shape=(256,256,3)) for i in range(N_view)]
+  else:
+    inputs = [tf.keras.Input(shape=(256,256,4)) for i in range(N_view)]
 
   model = ColorNet()
-  
+
   #to build weights 
+  # test_input = tf.random.uniform(shape=(16,16,256,256,4))
+  # outs = model([test_input[:, i] for i in range(16)])
   outs = model(inputs)
 
   return model
 
 def build_singleview_model(mode='RGBD'):
   #we use list for compability
-  inputs = [tf.keras.Input(shape=(128,128,4))]
+  inputs = [tf.keras.Input(shape=(256,256,4))]
   model = SingleViewColorNet()
 
   if mode == 'RGB':
-    inputs = [tf.keras.Input(shape=(128,128,3))]
+    inputs = [tf.keras.Input(shape=(256,256,3))]
 
   outs = model(inputs)
 

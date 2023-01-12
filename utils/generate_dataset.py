@@ -9,7 +9,7 @@ import pandas as pd
 from data_loader import load_and_preprocess_rgbd
 
 #get true Lab from csv, in order to use yours change create a similar function
-def get_lab(color_name, gt_df, light='D65'):
+def get_lab_1(color_name, gt_df, light='D65'):
     """
     V01 - use only the color name and the light to get the lab value. We have 1 Lab for each cube
     Get the true L,a,b value
@@ -29,8 +29,18 @@ def get_lab(color_name, gt_df, light='D65'):
 
     return [L, a, b]
 
+def get_lab_2(color_name, subcolor, gt_path):
+    """
+        other gt loader function
+    """
+    gt = pd.read_pickle(gt_path)
+    
+    c_df = gt.loc[gt['Color'] == color_name]
+    lab = c_df.loc[gt['N'] == int(subcolor), 'LAB'].values[0]
+    return lab
+
 def create_multiview_rgbd_dataset(opt):
-    df = np.array([],dtype=[('shape', 'U4'), ('color', 'U10'),('subcolor', np.int8), ('light', 'U4'), ('data', np.float16, (opt.n_views, 128, 128, 4)),('LAB', np.float16, (3,))])
+    # df = np.array([],dtype=[('shape', 'U4'), ('color', 'U10'),('subcolor', np.int8), ('light', 'U5'), ('data', np.float16, (opt.n_views, 128, 128, 4)),('LAB', np.float16, (3,))])
     
     #we assume just one shape and no subcolors
     # The folder shoud have this schema
@@ -40,41 +50,52 @@ def create_multiview_rgbd_dataset(opt):
     #           - RGB + D images
     #       - color_1
     #       - ...
-    shapes_list = os.listdir(opt.data_dir)
+    shapes_list = os.listdir(os.path.join(opt.data_dir,opt.illuminant))
 
     final_output = os.path.join(opt.output_dir, opt.illuminant)
 
-    gt_df = pd.read_csv(opt.gt)
-
+    # gt_df = pd.read_csv(opt.gt)
     for s in shapes_list:
-        colors_list = os.listdir(os.path.join(opt.data_dir, s))
+        print(s)
+        colors_list = os.listdir(os.path.join(opt.data_dir, opt.illuminant, s))
         for c in colors_list:
-            #inside the color folder we expect N RGB and N Depth images
+            print(s,c)
+            df = np.array([],dtype=[('shape', 'U4'), ('color', 'U10'),('subcolor', np.int8), ('light', 'U5'), ('data', np.float16, (opt.n_views, 256, 256, 4)),('LAB', np.float16, (3,))])
 
-            c_path = os.listdir(os.path.join(opt.data_dir, s, c))
+            sub_colors = os.listdir(os.path.join(opt.data_dir, opt.illuminant, s, c))
+            for sub_color in sub_colors:
+                #inside the color folder we expect N RGB and N Depth images
+                color_dir = os.path.join(opt.data_dir, opt.illuminant, s, c, sub_color)
+                c_path = os.listdir(color_dir)
 
-            #load and preprocess all rgbd images in the folder
-            rgbd = load_and_preprocess_rgbd(os.path.join(opt.data_dir, s, c),opt.n_views)
+                #load and preprocess all rgbd images in the folder
+                rgbd = load_and_preprocess_rgbd(color_dir,opt.n_views)
 
-            #get LAB value from gt
-            #default illuminant is D65
-            lab = get_lab(c, gt_df)
-            lab = np.ones(shape=(opt.n_views, 3)) * lab
+                #get LAB value from gt
+                #default illuminant is D65
+                lab = get_lab_2(c, sub_color, opt.gt)
+                lab = np.ones(shape=(opt.n_views, 3)) * lab
 
-            #merge rgbd, lab, light etc 
-            #default subcolor is 0 here, we keep it just to retro comp
-            data = np.array([([s]*16, [c] * 16, [0] * 16, [opt.illuminant]* 16, rgbd,lab)], #replace 1,2,3 with L* a* b*
-                  dtype=[('shape', 'U4',(16,)),('color', 'U10',(16,)), ('subcolor', np.int8,(16,)) ,('light', 'U4', (16,)), ('data', np.float16, (16, 128, 128, 4)), ('LAB', np.float16, (16,3))])
+                #merge rgbd, lab, light etc 
+                #default subcolor is 0 here, we keep it just to retro comp
+                data = np.array([([s]*16, [c] * 16, [int(sub_color)] * 16, [opt.illuminant]* 16, rgbd,lab)], #replace 1,2,3 with L* a* b*
+                    dtype=[('shape', 'U4',(16,)),('color', 'U10',(16,)), ('subcolor', np.int8,(16,)) ,('light', 'U5', (16,)), ('data', np.float16, (16, 256, 256, 4)), ('LAB', np.float16, (16,3))])
         
-        
-            #append to df
-            # if df.shape[0] == 0:
-            #         df = data
-            # else:
-            #     df = np.append(df, data, axis = 0)
             
+                #append to df
+                if df.shape[0] == 0:
+                    df = data
+                    print(df.shape)
+                else:
+                    df = np.append(df, data, axis = 0)
+                    print(df.shape)
+                
             os.makedirs(os.path.join(final_output,s), exist_ok=True)
-            np.save(os.path.join(final_output,s,c),data)
+            np.save(os.path.join(final_output,s,c),df)
+
+        print('Color {} done'.format(c))
+
+        
 
 if __name__ == '__main__':
 

@@ -184,13 +184,15 @@ def evaluate(opt):
     print('Test delta E mean:', results_test['DELTA'].mean(), 'std:', results_test['DELTA'].std())
 
     print('See results on {}'.format(final_output_dir))
+    
+    del model
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--illuminant', type=str, default='D65', help='illuminant to use [D65, F11, F4, ...]')
     parser.add_argument('--data_dir', type=str, default='multiviews', help='path to the dataset root')
     parser.add_argument('--output_dir', type=str, required=True, help='output directory pathname')
-    parser.add_argument('--n_views', type=int, default=16, choices=[16,8,4,3,2,1], help='number of views to use, 1 for single view model')
+    parser.add_argument('--n_views', type=int, default=16, help='number of views to use, 1 for single view model')
     parser.add_argument('--weights', type=str, help='path to the model weights', required=True)
     parser.add_argument('--mode', type=str, default='RGBD', help='RGBD or RGB mode', choices=['RGBD', 'RGB'])
     parser.add_argument('--test_on', type=str, choices=['subcolor', 'color', 'shape', 'folder_split'], default='subcolor', help="Select test set based on different subcolor/color/shape")

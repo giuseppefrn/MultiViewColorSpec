@@ -5,7 +5,7 @@ import os
 import tensorflow as tf
 import random 
 
-def load_and_preprocess_rgbd(data_dir, n_views, img_height=128, img_width=128):
+def load_and_preprocess_rgbd(data_dir, n_views, img_height=256, img_width=256):
 
     #we expect n_views * 2 imgs (RGB + D)
     files = os.listdir(data_dir)
@@ -43,7 +43,7 @@ def load_and_preprocess_rgbd(data_dir, n_views, img_height=128, img_width=128):
             rgb = tf.keras.preprocessing.image.img_to_array(rgb_image)
 
             #NORMALIZATION
-            d /=  (2**16 - 1) # we use 16 bit int as png file - this will return the real value as mt in range [0,1] 
+            d /=  255
             rgb /= 255        # normalize RGB channels 
 
             rgb_d = np.concatenate([rgb, d], axis=2, dtype=np.float16) #the array is RGBD now
@@ -99,7 +99,7 @@ def get_data_illuminant_data(data_path, illuminant):
     # data schema 
     #TODO check shape is misssing 
     #edit it isnt missing but not added in the dtype (get error.. to see)
-    df = np.array([],dtype=[('shape', 'U4'), ('color', 'U10'),('subcolor', np.int8), ('light', 'U4'), ('data', np.float16, (16, 128, 128, 4)),('LAB', np.float16, (3,))])
+    df = np.array([],dtype=[('shape', 'U4'), ('color', 'U10'),('subcolor', np.int8), ('light', 'U4'), ('data', np.float16, (16, 256, 256, 4)),('LAB', np.float16, (3,))])
 
     illuminant_path = os.path.join(data_path, illuminant)
     shapes_list = os.listdir(illuminant_path)
@@ -240,7 +240,8 @@ def get_tensorflow_dataset(df, batch_size=32):
             - df: tuple with (X, Y)
             - batch_size: int
     '''
-    ds = tf.data.Dataset.from_tensor_slices(df).shuffle(buffer_size=len(df[0])).batch(batch_size)
+    with tf.device("CPU"):
+        ds = tf.data.Dataset.from_tensor_slices(df).shuffle(buffer_size=len(df[0])).batch(batch_size)
 
     return ds
 
@@ -260,7 +261,7 @@ def get_data_from_dir(data_path):
             - illuminant: str name of the illuminant
     '''
 
-    df = np.array([],dtype=[('shape', 'U4'), ('color', 'U10'),('subcolor', np.int8), ('light', 'U4'), ('data', np.float16, (16, 128, 128, 4)),('LAB', np.float16, (3,))])
+    df = np.array([],dtype=[('shape', 'U4'), ('color', 'U10'),('subcolor', np.int8), ('light', 'U4'), ('data', np.float16, (16, 256, 256, 4)),('LAB', np.float16, (3,))])
 
     shapes_list = os.listdir(data_path)
 
