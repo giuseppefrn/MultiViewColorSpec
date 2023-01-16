@@ -27,9 +27,12 @@ def plot_model_delta_hist(opt):
 def predict_by_formula(opt):
     
     #dictonary to select a ROI for each shape
-    mask_dict = {'Toru': {'x':(73,78), 'y':(65,70), 'view': 2}, 'Cube': {'x':(60,65), 'y':(65,70), 'view': 15}, 'Suza': {'x':(60,65), 'y':(60,65), 'view': 12},
-                'Cone': {'x':(65,70), 'y':(70,75), 'view': 2}, 'Icos': {'x':(65,70), 'y':(60,65), 'view': 2}, 'Scul': {'x':(65,70), 'y':(60,65), 'view': 2},
-                }
+    # mask_dict = {'Toru': {'x':(73,78), 'y':(65,70), 'view': 2}, 'Cube': {'x':(60,65), 'y':(65,70), 'view': 15}, 'Suza': {'x':(60,65), 'y':(60,65), 'view': 12},
+    #             'Cone': {'x':(65,70), 'y':(70,75), 'view': 2}, 'Icos': {'x':(65,70), 'y':(60,65), 'view': 2}, 'Scul': {'x':(65,70), 'y':(60,65), 'view': 2},
+    #             }
+
+    mask_dict = {'Sculpture': {'x': 128, 'y': 117, 'view': 1}, 'Torus': {'x': 128, 'y': 129, 'view': 1}, 'Icosphere': {'x': 131, 'y': 119, 'view': 1}, 'Cone': {'x': 126, 'y': 133, 'view': 1}, 'Cube': {'x': 134, 'y': 121, 'view': 1}, 'Suzanne': {'x': 126, 'y': 115, 'view': 1}}
+
 
     df = get_data_illuminant_data(opt.data_dir, 'D65')
 
